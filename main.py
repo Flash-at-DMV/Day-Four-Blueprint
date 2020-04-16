@@ -2,31 +2,46 @@ import requests
 import os
 from urllib.parse import urlparse, urljoin
 
-def check_url(url = ""):
-  url = url.strip().lower()
-  try:
-    parsed_url = url
-    if not (url.startswith('//') or url.startswith('http://') or url.startswith('https://')):
-      parsed_url = '//' + url
+def validate_url(url = ""):
+  parsed_url = url.lower()
+  if not (url.startswith('//') or url.startswith('http://') or url.startswith('https://')):
+    parsed_url = '//' + url.lower()
 
-    parsed_url = urlparse(urljoin(parsed_url, "/"))._replace(scheme='http')
-    
-    if (all([parsed_url.scheme, parsed_url.netloc, parsed_url.path]) and len(parsed_url.netloc.split(".")) > 1):
-      parsed_url = parsed_url.geturl()
-    else:
-      print(f"{url} is not a valid URL.")
-      return
-    
+  parsed_url = urlparse(urljoin(parsed_url, "/"))._replace(scheme='http')
+  
+  if (all([parsed_url.scheme, parsed_url.netloc, parsed_url.path]) and len(parsed_url.netloc.split(".")) > 1):
+    return parsed_url.geturl()
+  
+  return False
+
+def check_url(url = ""):
+  url = url.strip()
+  parsed_url = validate_url(url)
+
+  if parsed_url is False:
+    print(f"{url} is not a valid URL.")
+    return
+
+  try:
     result_status = requests.get(parsed_url, timeout=3).status_code
 
     if result_status == requests.codes.ok:
       print(f"{url} is up!")
     else:
       print(f"{url} is down!")
+
   except Exception:
     print(f"{url} is down!")
-  
 
+def ask_to_try_again():
+  answer = input("Do you want to start over?(y/n)")
+
+  if answer == "y" or answer == "n":
+    return answer
+
+  print("That's not a valid answer")
+  ask_to_try_again()
+  
 def main():
   os.system("clear")
   print("Welcome to IsItDown.py!")
@@ -36,16 +51,9 @@ def main():
   for url in urls:
     check_url(url)
 
-  while True:
-    try_again = input("Do you want to start over?(y/n)")
-
-    if try_again == "y":
-      main()
-      break
-    elif try_again == "n":
-      print("k. bye!")
-      break
-    else:
-      print("That's not a valid answer")
+  if ask_to_try_again() == "y":
+    main()
+  else:
+    print("k. bye!")
 
 main()
