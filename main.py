@@ -40,13 +40,12 @@ def main():
     try_again = input("Do you want to start over?(y/n)")
 
     if try_again == "y":
-      return True
+      main()
+      break
     elif try_again == "n":
-      return False
+      print("k. bye!")
+      break
     else:
       print("That's not a valid answer")
 
-while True:
-  if main() is False:
-    print("k. bye!")
-    break
+main()
