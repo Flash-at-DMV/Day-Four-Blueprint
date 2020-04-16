@@ -40,7 +40,7 @@ def ask_to_try_again():
     return answer
 
   print("That's not a valid answer")
-  ask_to_try_again()
+  return ask_to_try_again()
   
 def main():
   os.system("clear")
